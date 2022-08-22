@@ -1,75 +1,123 @@
 import json
-
+import operator
 
 with open('skaterstats.json') as player:#opens json file and reads it, stores it as  a variable
     playerdata = json.load(player)
 
+#lists set for each type of statistic in the nhl storage (data structure)
+goal_scorers = []
+point_scorers = []
+assist_scorers = []
+biggest_hitters = []
+shorthanded_scorers = []
+shot_blockers = []
+pp_goal_scorers = []
+faceoff_winners = []
+plus_minus_list = []
+penalty_minutes = []
+game_winning_goals = []
+
+def adding_players():
+    for i in playerdata:#all players with more than 10 games played(all player)
+
+        position_player = i['stats']['position'] #returns the position of a specific player
+        city = i['stats']['competitor-seo-identifier'] #the team (or city) that a skater plays for
+
+        if city == 'new-york-rangers':
+            city = 'NYR'
+        elif i['stats']['competitor-seo-identifier'] == 'new-york-islanders:':
+            city = 'NYI'
+        elif i['stats']['competitor-seo-identifier'] == 'calgary-flames':
+            city = 'CGY'
+        elif i['stats']['competitor-seo-identifier'] == 'tampa-bay-lightning':
+            city = 'TBL'
+        elif i['stats']['competitor-seo-identifier'] == 'vegas-golden-knights':
+            city = 'VGK'
+        elif i['stats']['competitor-seo-identifier'] == 'los-angeles-kings':
+            city = 'LAK'
+        elif i['stats']['competitor-seo-identifier'] == 'st-louis-blues':
+            city = 'STL'
+        elif i['stats']['competitor-seo-identifier'] == 'new-jersey-devils':
+            city = 'NJ'
+        elif i['stats']['competitor-seo-identifier'] == 'san-jose-sharks':
+            city = 'SJS'
+        elif i['stats']['competitor-seo-identifier'] == 'florida-panthers':
+            city = 'FLA'
+        elif i['stats']['competitor-seo-identifier'] == 'columbus-blue-jackets':
+            city = 'CBJ'
+        elif i['stats']['competitor-seo-identifier'] == 'nashville-predators':
+            city = 'NSH'
+        else:
+            city = i['stats']['competitor-seo-identifier']
 
 
-#for i in playerdata:
-    #print(i['stats']['name']+',', i['stats']['position'])
-    #print('A:', i['stats']['assists'],'G:',i['stats']['goals'],
-          #'P:', i['stats']['points'], 'PIM:',i['stats']['penaltyInMinutes'], 'Blocked Shots:',i['stats']['blockedShots'],
-          #'TOI:',i['stats']['averageTimeOnIce'], 'Hits:',i['stats']['hits'])
-goals = []
-names = []
-assists = []
-points = []
-hits = []
+        best_scorers = [i['stats']['name'], int(i['stats']['goals']), position_player, city[0:3].upper()]
+        goal_scorers.append(best_scorers)
 
-playerName_goals = []
-playerName_assists = []
-playerName_points = []
-playerName_hits = []
-for i in playerdata:#all players with more than 10 games played(all player)
-    if int(i['stats']['gamesPlayed']) > 20:
-        names.append(i['stats']['name'])
-        goals.append(int(i['stats']['goals']))
-        assists.append(int(i['stats']['assists']))
-        points.append(int(i['stats']['points']))
-        hits.append(int(i['stats']['hits']))
+        highest_pointscorers = [i['stats']['name'], int(i['stats']['points']), position_player, city[0:3].upper()]
+        point_scorers.append(highest_pointscorers)
 
-for i in playerdata:#all players with more than 10 games and more than 15 goals (top goal scorers)
-    if int(i['stats']['goals']) > 25:
-        playerName_goals.append(i['stats']['name'])
-        goals.append(int(i['stats']['goals']))
+        highest_assisters = [i['stats']['name'], int(i['stats']['assists']), position_player, city[0:3].upper()]
+        assist_scorers.append(highest_assisters)
 
+        hardest_hitters = [i['stats']['name'], int(i['stats']['hits']), position_player, city[0:3].upper()]
+        biggest_hitters.append(hardest_hitters)
 
+        most_shorthandedgoals = [i['stats']['name'], int(i['stats']['shortHandedGoals']), position_player, city[0:3].upper()]
+        shorthanded_scorers.append(most_shorthandedgoals)
 
-for i in playerdata:#all players with more than 10 games and more than 20 assists(top assisters)
-    if int(i['stats']['assists']) > 20:
-        playerName_assists.append(i['stats']['name'])
-        assists.append(int(i['stats']['assists']))
+        most_shots_blocked = [i['stats']['name'], int(i['stats']['blockedShots']), position_player, city[0:3].upper()]
+        shot_blockers.append(most_shots_blocked)
+
+        pp_goals = [i['stats']['name'], int(i['stats']['ppGoals']), position_player, city[0:3].upper()]
+        pp_goal_scorers.append(pp_goals)
+
+        faceoff_wins = [i['stats']['name'], int(i['stats']['faceoffsWon']), position_player, city[0:3].upper()]
+        faceoff_winners.append(faceoff_wins)
+
+        plus_minus = [i['stats']['name'], int(i['stats']['plusMinus']), position_player, city[0:3].upper()]
+        plus_minus_list.append(plus_minus)
+
+        pen_mins = [i['stats']['name'], int(i['stats']['penaltyInMinutes']), position_player, city[0:3].upper()]
+        penalty_minutes.append(pen_mins)
+
+        game_win_goals = [i['stats']['name'], int(i['stats']['gameWinningGoals']), position_player, city[0:3].upper()]
+        game_winning_goals.append(game_win_goals)
 
 
-for i in playerdata:#all players with more than 10 games and more than 20 points(top point scorers)
-    if int(i['stats']['points']) > 35:
-        playerName_points.append(i['stats']['name'])
-        points.append(int(i['stats']['points']))
+adding_players()
 
-for i in playerdata:#all players with more than 10 games and more than 85 hits
-    #if int(i['stats']['hits']) > 20:
-    playerName_hits.append(i['stats']['name'])
-    hits.append(int(i['stats']['hits']))
+sorted_goalscorelist = sorted(goal_scorers, key=operator.itemgetter(1), reverse=True)
+tuple_scorer = tuple(tuple(skater) for skater in sorted_goalscorelist[0:5])
 
-goalScorers = dict(zip(playerName_goals,goals))
-assisters = dict(zip(playerName_assists,assists))
-pointScorers = dict(zip(playerName_points, points))
-hitters = dict(zip(playerName_hits, hits))
+sorted_pointscorelist = sorted(point_scorers, key=operator.itemgetter(1), reverse=True)
+tuple_points = tuple(tuple(skater) for skater in sorted_pointscorelist[0:5])
+
+sorted_assisterlist = sorted(assist_scorers, key=operator.itemgetter(1), reverse=True)
+tuple_assists = tuple(tuple(skater) for skater in sorted_assisterlist[0:5])
 
 
-best_goalScorers = {p: g for p,g in sorted(goalScorers.items(),key=lambda g: g[1], reverse=True)}
-best_assisters = {p: a for p,a in sorted(assisters.items(), key=lambda a: a[1], reverse=True)}
-best_pointScorers = {p: s for p,s in sorted(pointScorers.items(), key=lambda s: s[1], reverse=True)}
-best_hitters = {p: h for p,h in sorted(hitters.items(), key=lambda h: h[1], reverse=True)}
+sorted_hitters = sorted(biggest_hitters, key=operator.itemgetter(1), reverse=True)
+tuple_hitters = tuple(tuple(skater) for skater in sorted_hitters[0:5])
 
-for i,j in best_pointScorers.items():
-    print(i,j)
+sorted_SHG = sorted(shorthanded_scorers, key=operator.itemgetter(1), reverse=True)
+tuple_shorthanded = tuple(tuple(skater) for skater in sorted_SHG[0:5])
 
-def sort_players_descending(stat):
-    for player, statistic in stat.items():
-        print(player, statistic)
-#sort_players_descending(best_goalScorers)
-#sort_players_descending(best_assisters)
-#sort_players_descending(best_pointScorers)
-sort_players_descending(best_hitters)
+sorted_shotblockers = sorted(shot_blockers, key=operator.itemgetter(1), reverse=True)
+tuple_blocks = tuple(tuple(skater) for skater in sorted_shotblockers[0:5])
+
+sorted_pp_goals = sorted(pp_goal_scorers, key=operator.itemgetter(1), reverse=True)
+tuple_powerplay = tuple(tuple(skater) for skater in sorted_pp_goals[0:5])
+
+
+sorted_faceoff_wins = sorted(faceoff_winners, key=operator.itemgetter(1), reverse=True)
+tuple_faceoff = tuple(tuple(skater) for skater in sorted_faceoff_wins[0:5])
+
+sorted_plus_minus = sorted(plus_minus_list, key=operator.itemgetter(1), reverse=True)
+tuple_plus_minus = tuple(tuple(skater) for skater in sorted_plus_minus[0:5])
+
+sorted_pen_mins = sorted(penalty_minutes, key=operator.itemgetter(1), reverse=True)
+tuple_pen_mins = tuple(tuple(skater) for skater in sorted_pen_mins[0:5])
+
+sorted_game_win_goals = sorted(game_winning_goals, key=operator.itemgetter(1), reverse=True)
+tuple_game_win_goals = tuple(tuple(skater) for skater in sorted_game_win_goals[0:5])

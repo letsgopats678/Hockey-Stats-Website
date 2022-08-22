@@ -1,109 +1,82 @@
 import json
-
+import operator
 
 
 
 with open('goaliestats.json') as goalie: #opens the goalie file
-    goaliestats = json.load(goalie)
-#for i in goaliestats:
-    #print(i['stats']['name'])
-    #print('GAA:',i['stats']['goalsAgainstAverage'], 'GA:',i['stats']['goalsAgainst'],
-          #'SV%:',i['stats']['savePercentage'], 'Saves:',i['stats']['saves'], 'SA:',i['stats']['shotsAgainst'],
-          #'Shutouts:',i['stats']['shutouts'], 'W:',i['stats']['wins'])
+    goaltenderstats = json.load(goalie)
 
-"""
-arrays for holding the stats of each goaltender
-"""
-goalsAgainstAverage = []
-goalsAgainst = []
-savePercentage = []
-save = []
-shutouts = []
-shotsAgainst = []
+save_percentage = []
 wins = []
-
-"""
-stores the leaders(names of goaltenders) in each area in array (list)
-"""
-namesGAA = []
-namesGA = []
-namesSV = []
-namesSaves = []
-namesSA = []
-names_shutouts = []
-namesWins = []
-
-"""
-this function parses through the goalistats api data and returns the goaltenders
-in descending order (best to worst)
-"""
-for i in goaliestats:
-    if float(i['stats']['goalsAgainstAverage']) < 2.79:
-        namesGAA.append(i['stats']['name'])
-        goalsAgainstAverage.append(float(i['stats']['goalsAgainstAverage']))
-
-for i in goaliestats:
-    if int(i['stats']['goalsAgainst']) < 40:
-        namesGA.append(i['stats']['name'])
-        goalsAgainst.append(int(i['stats']['goalsAgainst']))
-
-for i in goaliestats:
-    if float(i['stats']['savePercentage']) > .922:
-        namesSV.append(i['stats']['name'])
-        savePercentage.append(float(i['stats']['savePercentage']))
-
-for i in goaliestats:
-    if int(i['stats']['shotsAgainst']) > 700:
-        namesSA.append(i['stats']['name'])
-        shotsAgainst.append(int(i['stats']['shotsAgainst']))
-
-for i in goaliestats:
-    if int(i['stats']['saves']) > 640:
-        namesSaves.append(i['stats']['name'])
-        save.append(int(i['stats']['saves']))
+saves = []
+shutouts = []
+avg_goals_against = []
 
 
-for i in goaliestats:
-    if int(i['stats']['shutouts']) >= 3:
-        names_shutouts.append(i['stats']['name'])
-        shutouts.append(int(i['stats']['shutouts']))
-
-for i in goaliestats:
-    if int(i['stats']['wins']) > 14:
-        namesWins.append(i['stats']['name'])
-        wins.append(int(i['stats']['wins']))
+for goaltender in goaltenderstats:
+    if int(goaltender['stats']['gamesPlayed']) > 20:
 
 
-"""
-connects the names of goaltenders and ties it with a specific stat, and zips it into a dictionary (name:kay, stat is the value)
-"""
+        city = goaltender['stats']['competitor-seo-identifier']  # the team (or city) that a skater plays for
 
-
-GAA = dict(zip(namesGAA,goalsAgainstAverage))
-GA = dict(zip(namesGA,goalsAgainst))
-SV = dict(zip(namesSV,savePercentage))
-saves = dict(zip(namesSaves,save))
-SA = dict(zip(namesSA, shotsAgainst))
-shutouts = dict(zip(names_shutouts,shutouts))
-wins = dict(zip(namesWins, wins))
-
-"""
-dictionaries that sorts the goaltender stats in ascending order
-"""
-lowest_GAA = {g: gaa for g,gaa in sorted(GAA.items(), key= lambda gaa: gaa[1])}
+        if city == 'new-york-rangers':
+            city = 'NYR'
+        elif goaltender['stats']['competitor-seo-identifier'] == 'new-york-islanders':
+            city = 'NYI'
+        elif goaltender['stats']['competitor-seo-identifier'] == 'calgary-flames':
+            city = 'CGY'
+        elif goaltender['stats']['competitor-seo-identifier'] == 'tampa-bay-lightning':
+            city = 'TBL'
+        elif goaltender['stats']['competitor-seo-identifier'] == 'vegas-golden-knights':
+            city = 'VGK'
+        elif goaltender['stats']['competitor-seo-identifier'] == 'los-angeles-kings':
+            city = 'LAK'
+        elif goaltender['stats']['competitor-seo-identifier'] == 'st-louis-blues':
+            city = 'STL'
+        elif goaltender['stats']['competitor-seo-identifier'] == 'new-jersey-devils':
+            city = 'NJ'
+        elif goaltender['stats']['competitor-seo-identifier'] == 'san-jose-sharks':
+            city = 'SJS'
+        elif goaltender['stats']['competitor-seo-identifier'] == 'florida-panthers':
+            city = 'FLA'
+        elif goaltender['stats']['competitor-seo-identifier'] == 'columbus-blue-jackets':
+            city = 'CBJ'
+        elif goaltender['stats']['competitor-seo-identifier'] == 'nashville-predators':
+            city = 'NSH'
+        else:
+            city = goaltender['stats']['competitor-seo-identifier']
 
 
 
+        most_shutouts = [goaltender['stats']['name'], int(goaltender['stats']['shutouts']), city[0:3].upper()]
+        shutouts.append(most_shutouts)
 
-lowest_GA = {g: ga for g,ga in sorted(GA.items(), key= lambda ga:ga[1])}
-highest_SV = {g: sv for g,sv in sorted(SV.items(), key=lambda sv: sv[1], reverse=True)}
-most_saves = {g: s for g,s in sorted(saves.items(), key= lambda s: s[1], reverse=True)}
-most_SA = {g: sa for g,sa in sorted(SA.items(), key=lambda sa: sa[1], reverse=True)}
-most_shutouts = {g: so for g,so in sorted(shutouts.items(), key=lambda so: so[1], reverse=True)}
-most_wins = {g: w for g,w in sorted(wins.items(), key= lambda w: w[1], reverse=True)}
+        num_wins = [goaltender['stats']['name'], int(goaltender['stats']['wins']), city[0:3].upper()]
+        wins.append(num_wins)
 
-def sort_goalies_descending(stat):
-    for goalie,statistic in stat.items():
-        print(goalie,statistic)
+        num_saves = [goaltender['stats']['name'], int(goaltender['stats']['saves']), city[0:3].upper()]
+        saves.append(num_saves)
 
-sort_goalies_descending(most_wins)
+        lowest_goals_against = [goaltender['stats']['name'], float(goaltender['stats']['goalsAgainstAverage']), city[0:3].upper()]
+        avg_goals_against.append(lowest_goals_against)
+
+
+        highest_save_percent = [goaltender['stats']['name'], float(goaltender['stats']['savePercentage']), city[0:3].upper()]
+        save_percentage.append(highest_save_percent)
+
+
+
+sorted_shutouts = sorted(shutouts, key=operator.itemgetter(1), reverse=True)
+tuple_shutouts = tuple(tuple(goaltender) for goaltender in sorted_shutouts[0:5])
+
+sorted_wins = sorted(wins, key=operator.itemgetter(1), reverse=True)
+tuple_wins = tuple(tuple(goaltender) for goaltender in sorted_wins[0:5])
+
+sorted_saves = sorted(saves, key=operator.itemgetter(1), reverse=True)
+tuple_saves = tuple(tuple(goaltender) for goaltender in sorted_saves[0:5])
+
+sorted_save_percentage = sorted(save_percentage, key=operator.itemgetter(1), reverse=True)
+tuple_save_percent = tuple(tuple(goaltender) for goaltender in sorted_save_percentage[0:5])
+
+sorted_avg_goals_against = sorted(avg_goals_against, key=operator.itemgetter(1), reverse=False)
+tuple_GAA = tuple(tuple(goaltender) for goaltender in sorted_avg_goals_against[0:5])
